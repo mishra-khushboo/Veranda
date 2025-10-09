@@ -18,17 +18,9 @@ app.get("/", (req, res) => {
   res.send("i am root");
 });
 
-app.get("/testListing", async (req, res) => {
-  let sampleListing = new Listing({
-    title: "mishra niwas",
-    description: "my new home",
-    price: 1200,
-    location: "Goa",
-    country: "india",
-  });
-  await sampleListing.save();
-  console.log("saved");
-  res.send("success");
+app.get("/listing", async (req, res) => {
+  const allListings = await Listing.find({});
+  res.render("index.ejs", { allListings });
 });
 app.listen(8080, () => {
   console.log("server is running");

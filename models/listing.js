@@ -8,14 +8,17 @@ const listingSchema = new Schema({
   },
   description: String,
   image: {
-    type: String,
-    default:
-      "https://c8.alamy.com/comp/R6FJT1/village-house-kerala-india-R6FJT1.jpg",
-    set: (v) =>
-      v === ""
-        ? "https://c8.alamy.com/comp/R6FJT1/village-house-kerala-india-R6FJT1.jpg"
-        : v,
+    filename: {
+      type: String,
+      default: "listingimage",
+    },
+    url: {
+      type: String,
+      default:
+        "https://c8.alamy.com/comp/R6FJT1/village-house-kerala-india-R6FJT1.jpg",
+    },
   },
+
   price: Number,
   location: String,
   country: String,
