@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const Listing = require("./models/listing.js");
 const path = require("path");
 const methodOverride = require("method-override");
+const ejsMate = require("ejs-mate");
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/Veranda";
 main()
@@ -17,16 +18,18 @@ async function main() {
   await mongoose.connect(MONGO_URL);
 }
 
+app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "/public")));
 
 app.get("/", (req, res) => {
   res.send("i am root");
 });
 
-app.get("/listing", async (req, res) => {
+app.get("/listings", async (req, res) => {
   const allListings = await Listing.find({});
   res.render("listings/index.ejs", { allListings });
 });
@@ -46,7 +49,7 @@ app.post("/listings", async (req, res) => {
   //let listing = req.body.listing;
   const newListing = new Listing(req.body.listing);
   await newListing.save();
-  res.redirect("/listing");
+  res.redirect("/listings");
 });
 //edit route
 app.get("/listings/:id/edit", async (req, res) => {
@@ -65,7 +68,7 @@ app.delete("/listings/:id", async (req, res) => {
   let { id } = req.params;
   let deletedListing = await Listing.findByIdAndDelete(id);
   console.log(deletedListing);
-  res.redirect("/listing");
+  res.redirect("/listings");
 });
 
 app.listen(8080, () => {
