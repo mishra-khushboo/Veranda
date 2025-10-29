@@ -82,3 +82,8 @@ body {
   opacity: 0.2;
   background-color: white;
 }
+/*edit page*/
+.edit-btn {
+  background-color: #fe424d !important;
+  border: none !important;
+}
