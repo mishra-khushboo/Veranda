@@ -87,3 +87,23 @@ body {
   background-color: #fe424d !important;
   border: none !important;
 }
+/* show Page */
+.show-img {
+  height: 30vh;
+}
+.btns {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.btns form {
+  margin: 0;
+}
+
+.btns a,
+.btns button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
