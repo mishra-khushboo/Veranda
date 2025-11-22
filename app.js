@@ -45,10 +45,17 @@ app.get("/listings/:id", async (req, res) => {
 });
 //create route
 app.post("/listings", async (req, res) => {
-  //let { title, description, image, price, country, location } = req.body;
-  //let listing = req.body.listing;
-  const newListing = new Listing(req.body.listing);
+  const listingData = req.body.listing;
+
+  // Converted image string → object (as schema requires)
+  listingData.image = {
+    url: listingData.image || "default",
+    filename: "user-uploaded",
+  };
+
+  const newListing = new Listing(listingData);
   await newListing.save();
+
   res.redirect("/listings");
 });
 //edit route
@@ -60,9 +67,20 @@ app.get("/listings/:id/edit", async (req, res) => {
 //update route
 app.put("/listings/:id", async (req, res) => {
   let { id } = req.params;
-  await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+  const listingData = req.body.listing;
+
+  // Converted image string → object (if user updated it)
+  if (listingData.image) {
+    listingData.image = {
+      url: listingData.image,
+      filename: "user-updated",
+    };
+  }
+
+  await Listing.findByIdAndUpdate(id, { ...listingData });
   res.redirect(`/listings/${id}`);
 });
+
 //delete route
 app.delete("/listings/:id", async (req, res) => {
   let { id } = req.params;
