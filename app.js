@@ -5,6 +5,7 @@ const Listing = require("./models/listing.js");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const wrapAsync = require("./utils/wrapAsync.js");
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/Veranda";
 main()
@@ -44,20 +45,15 @@ app.get("/listings/:id", async (req, res) => {
   res.render("listings/show.ejs", { listing });
 });
 //create route
-app.post("/listings", async (req, res) => {
-  const listingData = req.body.listing;
+app.post(
+  "/listings",
+  wrapAsync(async (req, res) => {
+    const newListing = new Listing(req.body.listing);
+    await newListing.save();
+    res.redirect("/listings");
+  })
+);
 
-  // Converted image string → object (as schema requires)
-  listingData.image = {
-    url: listingData.image || "default",
-    filename: "user-uploaded",
-  };
-
-  const newListing = new Listing(listingData);
-  await newListing.save();
-
-  res.redirect("/listings");
-});
 //edit route
 app.get("/listings/:id/edit", async (req, res) => {
   let { id } = req.params;
@@ -66,18 +62,10 @@ app.get("/listings/:id/edit", async (req, res) => {
 });
 //update route
 app.put("/listings/:id", async (req, res) => {
-  let { id } = req.params;
+  const { id } = req.params;
   const listingData = req.body.listing;
 
-  // Converted image string → object (if user updated it)
-  if (listingData.image) {
-    listingData.image = {
-      url: listingData.image,
-      filename: "user-updated",
-    };
-  }
-
-  await Listing.findByIdAndUpdate(id, { ...listingData });
+  await Listing.findByIdAndUpdate(id, listingData, { new: true });
   res.redirect(`/listings/${id}`);
 });
 
@@ -87,6 +75,10 @@ app.delete("/listings/:id", async (req, res) => {
   let deletedListing = await Listing.findByIdAndDelete(id);
   console.log(deletedListing);
   res.redirect("/listings");
+});
+
+app.use((err, req, res, next) => {
+  res.send("Something went wrong!");
 });
 
 app.listen(8080, () => {
