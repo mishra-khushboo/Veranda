@@ -17,7 +17,6 @@ const listingSchema = new Schema({
   country: String,
 });
 
-// Pre-save middleware: agar user empty string de, default set ho jaye
 listingSchema.pre("save", function (next) {
   if (!this.image || this.image.trim() === "") {
     this.image =
